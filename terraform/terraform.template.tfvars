@@ -1,0 +1,8 @@
+aws_region        = "us-east-1"
+ssh_public_key    = "<Make an SSH key pair, put the text of the public key here>"
+show_short_name = "<A short name for your show that will be used to name resources but is not visible to attendees>"
+show_domain_name = "<The domain name you purchased for your show, e.g. mirrors.show>"
+cloudflare_api_key = "<Your Cloudflare API Token>"
+lets_encrypt_email = "<The email where you will be notified if your letsencrypt certs expire (no spam)>"
+eventbrite_api_key = "<Your EventBrite API Token>"
+eventbrite_series_id = "<The Series ID (not Event ID) for your EventBrite Event>"

@@ -1,0 +1,52 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "region": "us-east-1",
+    "show_short_name": null
+  },
+  "builders": [
+    {
+      "type": "amazon-ebsvolume",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "{{user `region`}}",
+      "availability_zone": "us-east-1b",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/*ubuntu-bionic-18.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      },
+      "instance_type": "t3.micro",
+      "ssh_username": "ubuntu",
+      "ebs_volumes": [        
+        {
+          "device_name": "/dev/sdf",
+          "volume_size": 1,
+          "volume_type": "gp2",
+          "tags":{
+            "PromenadeShow": "{{user `show_short_name`}}",
+            "PromenadeResourceType": "mongo_volume"
+          }
+        }
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "./mongo_volume/",
+      "destination": "/home/ubuntu"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "bash ./format-volume.sh"
+      ]
+    }
+  ]
+}

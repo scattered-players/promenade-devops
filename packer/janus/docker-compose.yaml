@@ -1,0 +1,9 @@
+version: '2'
+services:
+  janus:
+    restart: unless-stopped
+    image: scatteredplayers/janus:x86
+    network_mode: host
+    volumes:
+      - '/mnt/secret/letsencrypt:/etc/letsencrypt'
+      - '/mnt/secret/janus-conf:/etc/janus'

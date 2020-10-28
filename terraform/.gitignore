@@ -1,0 +1,8 @@
+terraform.tfplan
+terraform.tfstate
+terraform.tfvars
+*.backup
+./*.tfstate
+.terraform/
+etc
+dump/

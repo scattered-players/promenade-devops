@@ -1,0 +1,12 @@
+[Unit]
+Description=Janus
+Requires=docker.service
+After=docker.service
+
+[Service]
+WorkingDirectory=/home/ubuntu
+Restart=always
+ExecStart=/home/ubuntu/boot.sh
+
+[Install]
+WantedBy=multi-user.target

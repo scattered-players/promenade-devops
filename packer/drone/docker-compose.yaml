@@ -1,0 +1,15 @@
+version: '3'
+services:
+  drone:
+    image: scatteredplayers/drone:x86
+    network_mode: host
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    environment: 
+      - IS_HEADLESS=true
+      - IS_PI=false
+      - USER_TYPE=attendee
+    volumes:
+      - '/mnt/secret/service-secrets:/usr/src/drone/secrets'
+      - '/tmp/.X11-unix:/tmp/.X11-unix'

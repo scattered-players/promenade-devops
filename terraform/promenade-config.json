@@ -1,0 +1,56 @@
+{
+  "SHOW_SHORT_NAME": "${show_short_name}",
+  "SHOW_DOMAIN_NAME": "${show_domain_name}",
+  "ENDING_TYPE": "CHOICE",
+  "JANUS_MODE": "MULTIPLE",
+  "DEFAULT_PARTIES": [
+    {
+      "name":"Team Red",
+      "color": "tomato",
+      "items": [
+        "Magic Notebook",
+        "Map of Rorrim"
+      ]
+    },
+    {
+      "name":"Team Pink",
+      "color": "pink",
+      "items": [
+        "Magic Notebook",
+        "Map of Rorrim"
+      ]
+    },
+    {
+      "name":"Team Yellow",
+      "color": "yellow",
+      "items": [
+        "Magic Notebook",
+        "Map of Rorrim"
+      ]
+    },
+    {
+      "name":"Team Green",
+      "color": "green",
+      "items": [
+        "Magic Notebook",
+        "Map of Rorrim"
+      ]
+    },
+    {
+      "name":"Team Blue",
+      "color": "dodgerblue",
+      "items": [
+        "Magic Notebook",
+        "Map of Rorrim"
+      ]
+    },
+    {
+      "name":"Team Purple",
+      "color": "purple",
+      "items": [
+        "Magic Notebook",
+        "Map of Rorrim"
+      ]
+    }
+  ]
+}

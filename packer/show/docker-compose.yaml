@@ -1,0 +1,13 @@
+version: '3'
+services:
+  showservice:
+    image: scatteredplayers/show:x86
+    environment: 
+      - PORT=443
+      - NODE_ENV=production
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - '/mnt/secret/letsencrypt:/etc/letsencrypt'
+      - '/mnt/secret/service-secrets:/usr/src/show-service/secrets'
