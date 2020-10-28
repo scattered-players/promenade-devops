@@ -25,7 +25,7 @@ resource "aws_s3_bucket_object" "show_credentials" {
 # Our default security group to access
 # the instances over SSH and HTTP
 resource "aws_security_group" "show_security_group" {
-  name        = "show_service_sg"
+  name        = "${var.show_short_name}_show_service_sg"
   description = "Used in the terraform"
 
   # SSH access from anywhere

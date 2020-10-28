@@ -1,7 +1,7 @@
 # Our default security group to access
 # the instances over SSH and HTTP
 resource "aws_security_group" "mongo_security_group" {
-  name        = "mongo_service_sg"
+  name        = "${var.show_short_name}_mongo_service_sg"
   description = "Used in the terraform"
 
   # SSH access from anywhere
