@@ -56,3 +56,7 @@ variable "should_format_volume" {
   type    = bool
   default = false
 }
+
+variable "instance_size" {
+  default = "t4g.micro"
+}

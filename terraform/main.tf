@@ -75,6 +75,7 @@ module "certs" {
   show_domain_name = var.show_domain_name
   lets_encrypt_email = var.lets_encrypt_email
   ssh_key_pair = aws_key_pair.show_key_pair.key_name
+  instance_size = var.instance_size
 }
 
 resource "random_password" "mongo_password" {
@@ -97,6 +98,7 @@ module "mongo" {
   mongo_user = local.mongo_user
   mongo_password = random_password.mongo_password.result
   ssh_key_pair = aws_key_pair.show_key_pair.key_name
+  instance_size = var.instance_size
 }
 
 module "show_service" {
@@ -115,6 +117,7 @@ module "show_service" {
   eventbrite_api_key = var.eventbrite_api_key
   eventbrite_series_id = var.eventbrite_series_id
   ssh_key_pair = aws_key_pair.show_key_pair.key_name
+  instance_size = var.instance_size
 }
 
 module "janus" {
@@ -127,4 +130,5 @@ module "janus" {
   server_count = var.janus_server_count
   ssh_key_pair = aws_key_pair.show_key_pair.key_name
   janus_api_key = random_password.janus_api_key.result
+  instance_size = var.instance_size
 }

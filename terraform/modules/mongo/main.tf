@@ -92,7 +92,7 @@ data "aws_ami" "mongo_ami" {
 
   filter {
     name   = "name"
-    values = ["${var.show_short_name}-mongo-x86"]
+    values = ["${var.show_short_name}-mongo-arm64"]
   }
 }
 
@@ -132,9 +132,48 @@ data "aws_ebs_volume" "mongo_volume" {
   }
 }
 
-resource "aws_spot_instance_request" "mongo_service" {
-  instance_type = "t3.micro"
-  wait_for_fulfillment = true
+# resource "aws_spot_instance_request" "mongo_service" {
+#   instance_type = var.instance_size
+#   wait_for_fulfillment = true
+
+#   # Lookup the correct AMI based on the region
+#   # we specified
+#   ami = data.aws_ami.mongo_ami.image_id
+
+#   availability_zone = data.aws_ebs_volume.mongo_volume.availability_zone
+
+#   iam_instance_profile = aws_iam_instance_profile.mongo_profile.name
+
+#   # The name of our SSH keypair we created above.
+#   key_name = var.ssh_key_pair
+
+#   # Our Security group to allow HTTP and SSH access
+#   vpc_security_group_ids = [aws_security_group.mongo_security_group.id]
+#   user_data = file("${path.module}/mount-volume.sh")
+
+#   tags = {
+#     PromenadeShow = var.show_short_name
+#     PromenadeResourceType = "mongo_vm"
+#   }
+# }
+
+# resource "aws_volume_attachment" "mongo_att" {
+#   device_name = "/dev/sdf"
+#   volume_id   = data.aws_ebs_volume.mongo_volume.id
+#   instance_id = aws_spot_instance_request.mongo_service.spot_instance_id
+# }
+
+# resource "cloudflare_record" "mongo_service" {
+#   zone_id = var.cloudflare_zone_id
+#   name    = "mongo.${var.show_domain_name}"
+#   type    = "A"
+#   ttl     = "60"
+#   value   = aws_spot_instance_request.mongo_service.public_ip
+#   proxied = false
+# }
+
+resource "aws_instance" "mongo_service" {
+  instance_type = var.instance_size
 
   # Lookup the correct AMI based on the region
   # we specified
@@ -160,7 +199,7 @@ resource "aws_spot_instance_request" "mongo_service" {
 resource "aws_volume_attachment" "mongo_att" {
   device_name = "/dev/sdf"
   volume_id   = data.aws_ebs_volume.mongo_volume.id
-  instance_id = aws_spot_instance_request.mongo_service.spot_instance_id
+  instance_id = aws_instance.mongo_service.id
 }
 
 resource "cloudflare_record" "mongo_service" {
@@ -168,6 +207,6 @@ resource "cloudflare_record" "mongo_service" {
   name    = "mongo.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_spot_instance_request.mongo_service.public_ip
+  value   = aws_instance.mongo_service.public_ip
   proxied = false
 }

@@ -21,9 +21,9 @@
         "owners": ["099720109477"],
         "most_recent": true
       },
-      "instance_type": "t3.micro",
+      "instance_type": "t4g.micro",
       "ssh_username": "ubuntu",
-      "ami_name": "{{user `show_short_name`}}-{{user `image_type`}}-x86"
+      "ami_name": "{{user `show_short_name`}}-{{user `image_type`}}-arm"
     }
   ],
   "provisioners": [

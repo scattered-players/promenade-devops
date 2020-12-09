@@ -120,7 +120,7 @@ data "template_file" "init" {
 }
 
 resource "aws_spot_instance_request" "certs_service" {
-  instance_type = "t3.micro"
+  instance_type = var.instance_size
   wait_for_fulfillment = true
 
   # Lookup the correct AMI based on the region

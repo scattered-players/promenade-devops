@@ -19,3 +19,6 @@ variable "ssh_key_pair" {
 
 variable "janus_api_key" {
 }
+
+variable "instance_size" {
+}

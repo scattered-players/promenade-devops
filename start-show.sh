@@ -6,4 +6,6 @@ terraform apply \
   -auto-approve \
   -var 'run_show=true'
 
+sleep 15 
+
 ./get-admin-url.sh

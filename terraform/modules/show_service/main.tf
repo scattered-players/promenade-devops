@@ -124,19 +124,51 @@ data "aws_ami" "show_ami" {
 
   filter {
     name   = "name"
-    values = ["${var.show_short_name}-show-x86"]
+    values = ["${var.show_short_name}-show-arm64"]
   }
 }
 
-resource "aws_spot_instance_request" "show_service" {
-  instance_type = "t3.micro"
-  wait_for_fulfillment = true
+# resource "aws_spot_instance_request" "show_service" {
+#   instance_type = var.instance_size
+#   wait_for_fulfillment = true
+
+#   # Lookup the correct AMI based on the region
+#   # we specified
+#   ami = data.aws_ami.show_ami.image_id
+
+#   availability_zone = "us-east-1a"
+
+#   iam_instance_profile = aws_iam_instance_profile.show_profile.name
+
+#   # The name of our SSH keypair we created above.
+#   key_name = var.ssh_key_pair
+
+#   # Our Security group to allow HTTP and SSH access
+#   vpc_security_group_ids = [aws_security_group.show_security_group.id]
+
+#   tags = {
+#     PromenadeShow = var.show_short_name
+#     PromenadeResourceType = "show_vm"
+#   }
+# }
+
+# resource "cloudflare_record" "show_service" {
+#   zone_id = var.cloudflare_zone_id
+#   name    = "services.${var.show_domain_name}"
+#   type    = "A"
+#   ttl     = "60"
+#   value   = aws_spot_instance_request.show_service.public_ip
+#   proxied = false
+# }
+
+resource "aws_instance" "show_service" {
+  instance_type = var.instance_size
 
   # Lookup the correct AMI based on the region
   # we specified
   ami = data.aws_ami.show_ami.image_id
 
-  availability_zone = "us-east-1b"
+  availability_zone = "us-east-1a"
 
   iam_instance_profile = aws_iam_instance_profile.show_profile.name
 
@@ -157,6 +189,6 @@ resource "cloudflare_record" "show_service" {
   name    = "services.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_spot_instance_request.show_service.public_ip
+  value   = aws_instance.show_service.public_ip
   proxied = false
 }

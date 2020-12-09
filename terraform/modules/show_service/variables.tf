@@ -27,3 +27,6 @@ variable "eventbrite_series_id" {
 
 variable "ssh_key_pair" {
 }
+
+variable "instance_size" {
+}
