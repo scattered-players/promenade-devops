@@ -124,45 +124,38 @@ data "aws_ami" "show_ami" {
 
   filter {
     name   = "name"
-    values = ["${var.show_short_name}-show-arm64"]
+    values = ["${var.show_short_name}-show-${var.arch}"]
   }
 }
 
-# resource "aws_spot_instance_request" "show_service" {
-#   instance_type = var.instance_size
-#   wait_for_fulfillment = true
+resource "aws_spot_instance_request" "show_service" {
+  count = var.use_spot ? 1 : 0
+  instance_type = (var.arch == "arm64") ? "t4g.micro" : "t3a.micro" 
+  wait_for_fulfillment = true
 
-#   # Lookup the correct AMI based on the region
-#   # we specified
-#   ami = data.aws_ami.show_ami.image_id
+  # Lookup the correct AMI based on the region
+  # we specified
+  ami = data.aws_ami.show_ami.image_id
 
-#   availability_zone = "us-east-1a"
+  availability_zone = "us-east-1a"
 
-#   iam_instance_profile = aws_iam_instance_profile.show_profile.name
+  iam_instance_profile = aws_iam_instance_profile.show_profile.name
 
-#   # The name of our SSH keypair we created above.
-#   key_name = var.ssh_key_pair
+  # The name of our SSH keypair we created above.
+  key_name = var.ssh_key_pair
 
-#   # Our Security group to allow HTTP and SSH access
-#   vpc_security_group_ids = [aws_security_group.show_security_group.id]
+  # Our Security group to allow HTTP and SSH access
+  vpc_security_group_ids = [aws_security_group.show_security_group.id]
 
-#   tags = {
-#     PromenadeShow = var.show_short_name
-#     PromenadeResourceType = "show_vm"
-#   }
-# }
-
-# resource "cloudflare_record" "show_service" {
-#   zone_id = var.cloudflare_zone_id
-#   name    = "services.${var.show_domain_name}"
-#   type    = "A"
-#   ttl     = "60"
-#   value   = aws_spot_instance_request.show_service.public_ip
-#   proxied = false
-# }
+  tags = {
+    PromenadeShow = var.show_short_name
+    PromenadeResourceType = "show_vm"
+  }
+}
 
 resource "aws_instance" "show_service" {
-  instance_type = var.instance_size
+  count = var.use_spot ? 0 : 1
+  instance_type = (var.arch == "arm64") ? "t4g.micro" : "t3a.micro" 
 
   # Lookup the correct AMI based on the region
   # we specified
@@ -189,6 +182,6 @@ resource "cloudflare_record" "show_service" {
   name    = "services.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_instance.show_service.public_ip
+  value   = var.use_spot ? aws_spot_instance_request.show_service[0].public_ip : aws_instance.show_service[0].public_ip
   proxied = false
 }

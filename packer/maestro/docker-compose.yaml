@@ -1,7 +1,7 @@
 version: '3'
 services:
   maestro:
-    image: scatteredplayers/maestro:x86
+    image: scatteredplayers/maestro:multiplatform
     environment: 
       - PORT=80
     ports:

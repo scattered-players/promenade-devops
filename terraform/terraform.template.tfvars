@@ -6,3 +6,6 @@ cloudflare_api_key = "<Your Cloudflare API Token>"
 lets_encrypt_email = "<The email where you will be notified if your letsencrypt certs expire (no spam)>"
 eventbrite_api_key = "<Your EventBrite API Token>"
 eventbrite_series_id = "<The Series ID (not Event ID) for your EventBrite Event>"
+janus_server_count = "<a number from 1 to 6 (cannot be 0)"
+arch = "<amd64 or arm64>"
+use_spot = false

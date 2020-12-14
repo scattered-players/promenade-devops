@@ -22,7 +22,7 @@ echo "s3fs#${short_short_name}-secret /mnt/secret fuse _netdev,rw,uid=1000,gid=1
 
 # sudo systemctl disable mongo;
 sudo cp mongo.service /etc/systemd/system/mongo.service;
-# sudo systemctl enable mongo;
+sudo systemctl enable mongo;
 
 echo -e "./status.sh\n./status-feed.sh\n./monitor.sh\ntmux new-session  'htop' \\; split-window './status-feed.sh'" > /home/ubuntu/.bash_history
 

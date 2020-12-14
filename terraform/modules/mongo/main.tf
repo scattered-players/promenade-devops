@@ -92,7 +92,7 @@ data "aws_ami" "mongo_ami" {
 
   filter {
     name   = "name"
-    values = ["${var.show_short_name}-mongo-arm64"]
+    values = ["${var.show_short_name}-mongo-${var.arch}"]
   }
 }
 
@@ -132,48 +132,35 @@ data "aws_ebs_volume" "mongo_volume" {
   }
 }
 
-# resource "aws_spot_instance_request" "mongo_service" {
-#   instance_type = var.instance_size
-#   wait_for_fulfillment = true
+resource "aws_spot_instance_request" "mongo_service" {
+  count = var.use_spot ? 1 : 0
+  instance_type = (var.arch == "arm64") ? "t4g.micro" : "t3a.micro" 
+  wait_for_fulfillment = true
 
-#   # Lookup the correct AMI based on the region
-#   # we specified
-#   ami = data.aws_ami.mongo_ami.image_id
+  # Lookup the correct AMI based on the region
+  # we specified
+  ami = data.aws_ami.mongo_ami.image_id
 
-#   availability_zone = data.aws_ebs_volume.mongo_volume.availability_zone
+  availability_zone = data.aws_ebs_volume.mongo_volume.availability_zone
 
-#   iam_instance_profile = aws_iam_instance_profile.mongo_profile.name
+  iam_instance_profile = aws_iam_instance_profile.mongo_profile.name
 
-#   # The name of our SSH keypair we created above.
-#   key_name = var.ssh_key_pair
+  # The name of our SSH keypair we created above.
+  key_name = var.ssh_key_pair
 
-#   # Our Security group to allow HTTP and SSH access
-#   vpc_security_group_ids = [aws_security_group.mongo_security_group.id]
-#   user_data = file("${path.module}/mount-volume.sh")
+  # Our Security group to allow HTTP and SSH access
+  vpc_security_group_ids = [aws_security_group.mongo_security_group.id]
+  user_data = file("${path.module}/mount-volume.sh")
 
-#   tags = {
-#     PromenadeShow = var.show_short_name
-#     PromenadeResourceType = "mongo_vm"
-#   }
-# }
-
-# resource "aws_volume_attachment" "mongo_att" {
-#   device_name = "/dev/sdf"
-#   volume_id   = data.aws_ebs_volume.mongo_volume.id
-#   instance_id = aws_spot_instance_request.mongo_service.spot_instance_id
-# }
-
-# resource "cloudflare_record" "mongo_service" {
-#   zone_id = var.cloudflare_zone_id
-#   name    = "mongo.${var.show_domain_name}"
-#   type    = "A"
-#   ttl     = "60"
-#   value   = aws_spot_instance_request.mongo_service.public_ip
-#   proxied = false
-# }
+  tags = {
+    PromenadeShow = var.show_short_name
+    PromenadeResourceType = "mongo_vm"
+  }
+}
 
 resource "aws_instance" "mongo_service" {
-  instance_type = var.instance_size
+  count = var.use_spot ? 0 : 1
+  instance_type = (var.arch == "arm64") ? "t4g.micro" : "t3a.micro" 
 
   # Lookup the correct AMI based on the region
   # we specified
@@ -199,7 +186,7 @@ resource "aws_instance" "mongo_service" {
 resource "aws_volume_attachment" "mongo_att" {
   device_name = "/dev/sdf"
   volume_id   = data.aws_ebs_volume.mongo_volume.id
-  instance_id = aws_instance.mongo_service.id
+  instance_id = var.use_spot ? aws_spot_instance_request.mongo_service[0].spot_instance_id : aws_instance.mongo_service[0].id
 }
 
 resource "cloudflare_record" "mongo_service" {
@@ -207,6 +194,6 @@ resource "cloudflare_record" "mongo_service" {
   name    = "mongo.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_instance.mongo_service.public_ip
+  value   = var.use_spot ? aws_spot_instance_request.mongo_service[0].public_ip : aws_instance.mongo_service[0].public_ip
   proxied = false
 }

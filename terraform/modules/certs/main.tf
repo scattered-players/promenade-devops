@@ -95,12 +95,12 @@ data "aws_ami" "ubuntu_ami" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/*ubuntu-bionic-18.04-amd64-server-*"]
+    values = ["ubuntu/images/*ubuntu-bionic-18.04-${var.arch}-server-*"]
   }
 
   filter {
     name   = "architecture"
-    values = ["x86_64"]
+    values = [var.arch]
   }
 
   filter {
@@ -119,8 +119,18 @@ data "template_file" "init" {
   }
 }
 
+resource "tls_private_key" "certs_service_key" {
+  algorithm   = "RSA"
+}
+
+resource "aws_key_pair" "certs_service_key_pair" {
+  key_name   = "${var.show_short_name}-certs-key"
+  public_key = tls_private_key.certs_service_key.public_key_openssh
+}
+
 resource "aws_spot_instance_request" "certs_service" {
-  instance_type = var.instance_size
+  count = var.use_spot ? 1 : 0
+  instance_type = (var.arch == "arm64") ? "t4g.micro" : "t3a.micro" 
   wait_for_fulfillment = true
 
   # Lookup the correct AMI based on the region
@@ -132,7 +142,31 @@ resource "aws_spot_instance_request" "certs_service" {
   iam_instance_profile = aws_iam_instance_profile.certs_profile.name
 
   # The name of our SSH keypair we created above.
-  key_name = var.ssh_key_pair
+  key_name = aws_key_pair.certs_service_key_pair.key_name
+
+  # Our Security group to allow HTTP and SSH access
+  vpc_security_group_ids = [aws_security_group.certs_security_group.id]
+
+  tags = {
+    PromenadeShow = var.show_short_name
+    PromenadeResourceType = "cert_fetcher"
+  }
+}
+
+resource "aws_instance" "certs_service" {
+  count = var.use_spot ? 0 : 1
+  instance_type = (var.arch == "arm64") ? "t4g.micro" : "t3a.micro" 
+
+  # Lookup the correct AMI based on the region
+  # we specified
+  ami = data.aws_ami.ubuntu_ami.image_id
+
+  availability_zone = "us-east-1a"
+
+  iam_instance_profile = aws_iam_instance_profile.certs_profile.name
+
+  # The name of our SSH keypair we created above.
+  key_name = aws_key_pair.certs_service_key_pair.key_name
 
   # Our Security group to allow HTTP and SSH access
   vpc_security_group_ids = [aws_security_group.certs_security_group.id]
@@ -148,7 +182,7 @@ resource "cloudflare_record" "janus" {
   name    = "janus.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_spot_instance_request.certs_service.public_ip
+  value   = var.use_spot ? aws_spot_instance_request.certs_service[0].public_ip : aws_instance.certs_service[0].public_ip
   proxied = false
 }
 
@@ -157,7 +191,7 @@ resource "cloudflare_record" "show" {
   name    = "services.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_spot_instance_request.certs_service.public_ip
+  value   = var.use_spot ? aws_spot_instance_request.certs_service[0].public_ip : aws_instance.certs_service[0].public_ip
   proxied = false
 }
 
@@ -166,7 +200,7 @@ resource "cloudflare_record" "mongo" {
   name    = "mongo.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_spot_instance_request.certs_service.public_ip
+  value   = var.use_spot ? aws_spot_instance_request.certs_service[0].public_ip : aws_instance.certs_service[0].public_ip
   proxied = false
 }
 
@@ -176,7 +210,7 @@ resource "cloudflare_record" "janus_numbered" {
   name    = "janus${count.index}.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_spot_instance_request.certs_service.public_ip
+  value   = var.use_spot ? aws_spot_instance_request.certs_service[0].public_ip : aws_instance.certs_service[0].public_ip
   proxied = false
 }
 
@@ -190,7 +224,8 @@ resource "null_resource" "cert_script" {
   connection {
     type = "ssh"
     user = "ubuntu"
-    host = aws_spot_instance_request.certs_service.public_ip
+    host = var.use_spot ? aws_spot_instance_request.certs_service[0].public_ip : aws_instance.certs_service[0].public_ip
+    private_key = tls_private_key.certs_service_key.private_key_pem
   }
 
   provisioner "remote-exec" {

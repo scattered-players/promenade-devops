@@ -20,5 +20,8 @@ variable "mongo_password" {
 variable "ssh_key_pair" {
 }
 
-variable "instance_size" {
+variable "arch" {
+}
+
+variable "use_spot" {
 }

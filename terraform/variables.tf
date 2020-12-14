@@ -52,11 +52,15 @@ variable "run_janus" {
   default = false
 }
 
-variable "should_format_volume" {
-  type    = bool
-  default = false
-}
-
 variable "instance_size" {
   default = "t4g.micro"
+}
+
+variable "arch" {
+  default = "arm64"
+}
+
+variable "use_spot" {
+  type    = bool
+  default = false
 }

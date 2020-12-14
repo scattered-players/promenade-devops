@@ -4,8 +4,8 @@ terraform {
       source = "hashicorp/aws"
     }
     cloudflare = {
-      source = "terraform-providers/cloudflare"
+      source = "cloudflare/cloudflare"
     }
   }
-  required_version = ">= 0.13"
+  required_version = ">= 0.14"
 }

@@ -4,7 +4,9 @@
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "region": "us-east-1",
     "show_short_name": null,
-    "image_type": null
+    "image_type": null,
+    "arch": null,
+    "instance_type": null
   },
   "builders": [
     {
@@ -15,15 +17,15 @@
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "ubuntu/images/*ubuntu-bionic-18.04-amd64-server-*",
+          "name": "ubuntu/images/*ubuntu-focal-20.04-{{user `arch`}}-server-*",
           "root-device-type": "ebs"
         },
         "owners": ["099720109477"],
         "most_recent": true
       },
-      "instance_type": "t4g.micro",
+      "instance_type": "{{user `instance_type`}}",
       "ssh_username": "ubuntu",
-      "ami_name": "{{user `show_short_name`}}-{{user `image_type`}}-arm"
+      "ami_name": "{{user `show_short_name`}}-{{user `image_type`}}-{{user `arch`}}"
     }
   ],
   "provisioners": [

@@ -130,69 +130,49 @@ data "aws_ami" "janus_ami" {
 
   filter {
     name   = "name"
-    values = ["${var.show_short_name}-janus-arm64"]
+    values = ["${var.show_short_name}-janus-${var.arch}"]
   }
 }
 
-# resource "aws_spot_instance_request" "janus_service" {
-
-#   depends_on = [
-#     aws_s3_bucket_object.janus_config
-#   ]
-#   count = var.server_count
-
-#   # spot_price    = "0.03"
-#   instance_type = var.instance_size
-#   wait_for_fulfillment = true
-
-#   # Lookup the correct AMI based on the region
-#   # we specified
-#   ami = data.aws_ami.janus_ami.image_id
-
-#   availability_zone = "us-east-1a"
-
-#   iam_instance_profile = aws_iam_instance_profile.janus_profile.name
-
-#   # The name of our SSH keypair we created above.
-#   key_name = var.ssh_key_pair
-
-#   # Our Security group to allow HTTP and SSH access
-#   vpc_security_group_ids = [aws_security_group.janus_security_group.id]
-
-#   tags = {
-#     PromenadeShow = var.show_short_name
-#     PromenadeResourceType = "janus_vm"
-#   }
-# }
-
-# resource "cloudflare_record" "janus" {
-#   zone_id = var.cloudflare_zone_id
-#   name    = "janus.${var.show_domain_name}"
-#   type    = "A"
-#   ttl     = "60"
-#   value   = aws_spot_instance_request.janus_service[0].public_ip
-#   proxied = false
-# }
-
-# resource "cloudflare_record" "janus_numbered" {
-#   count = var.server_count
-#   zone_id = var.cloudflare_zone_id
-#   name    = "janus${count.index}.${var.show_domain_name}"
-#   type    = "A"
-#   ttl     = "60"
-#   value   = aws_spot_instance_request.janus_service[count.index].public_ip
-#   proxied = false
-# }
-
-resource "aws_instance" "janus_service" {
+resource "aws_spot_instance_request" "janus_service" {
 
   depends_on = [
     aws_s3_bucket_object.janus_config
   ]
-  count = var.server_count
+  count = var.use_spot ? var.server_count : 0
 
   # spot_price    = "0.03"
-  instance_type = var.instance_size
+  instance_type = (var.arch == "arm64") ? "t4g.micro" : "t3a.micro" 
+  wait_for_fulfillment = true
+
+  # Lookup the correct AMI based on the region
+  # we specified
+  ami = data.aws_ami.janus_ami.image_id
+
+  availability_zone = "us-east-1a"
+
+  iam_instance_profile = aws_iam_instance_profile.janus_profile.name
+
+  # The name of our SSH keypair we created above.
+  key_name = var.ssh_key_pair
+
+  # Our Security group to allow HTTP and SSH access
+  vpc_security_group_ids = [aws_security_group.janus_security_group.id]
+
+  tags = {
+    PromenadeShow = var.show_short_name
+    PromenadeResourceType = "janus_vm"
+  }
+}
+
+resource "aws_instance" "janus_service" {
+  depends_on = [
+    aws_s3_bucket_object.janus_config
+  ]
+  count = var.use_spot ? 0: var.server_count
+
+  # spot_price    = "0.03"
+  instance_type = (var.arch == "arm64") ? "t4g.micro" : "t3a.micro" 
 
   # Lookup the correct AMI based on the region
   # we specified
@@ -219,7 +199,7 @@ resource "cloudflare_record" "janus" {
   name    = "janus.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_instance.janus_service[0].public_ip
+  value   = var.use_spot ? aws_spot_instance_request.janus_service[0].public_ip : aws_instance.janus_service[0].public_ip
   proxied = false
 }
 
@@ -229,6 +209,6 @@ resource "cloudflare_record" "janus_numbered" {
   name    = "janus${count.index}.${var.show_domain_name}"
   type    = "A"
   ttl     = "60"
-  value   = aws_instance.janus_service[count.index].public_ip
+  value   = var.use_spot ? aws_spot_instance_request.janus_service[count.index].public_ip : aws_instance.janus_service[count.index].public_ip
   proxied = false
 }

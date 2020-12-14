@@ -11,11 +11,11 @@
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
       "region": "{{user `region`}}",
-      "availability_zone": "us-east-1b",
+      "availability_zone": "us-east-1a",
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "ubuntu/images/*ubuntu-bionic-18.04-amd64-server-*",
+          "name": "ubuntu/images/*ubuntu-bionic-18.04-arm64-server-*",
           "root-device-type": "ebs"
         },
         "owners": ["099720109477"],

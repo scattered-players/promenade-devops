@@ -1,8 +1,8 @@
 {
   "SHOW_SHORT_NAME": "${show_short_name}",
   "SHOW_DOMAIN_NAME": "${show_domain_name}",
+  "JANUS_SERVER_COUNT": ${janus_server_count},
   "ENDING_TYPE": "CHOICE",
-  "JANUS_MODE": "MULTIPLE",
   "DEFAULT_PARTIES": [
     {
       "name":"Team Red",

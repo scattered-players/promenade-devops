@@ -16,5 +16,8 @@ variable "lets_encrypt_email" {
 variable "ssh_key_pair" {
 }
 
-variable "instance_size" {
+variable "arch" {
+}
+
+variable "use_spot" {
 }

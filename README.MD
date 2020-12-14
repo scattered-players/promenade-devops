@@ -50,6 +50,11 @@ I'd advise reading over **ALL** of these instructions **BEFORE** starting on any
 2. Log into the Admin panel (https://YOUR.DOMAIN/admin). Your shows should appear on the "Today's Shows" tab.
 3. Click the "SYNC FROM EVENTBRITE" button to sync over all the attendees. This is automatically done when the server boots up, but it's good to do it right before the show starts so you don't miss any late-coming ticket buyers.
 
+
+### Running a show without needing scripts
+
+If you want to hand off Promenade to someone who is less familiar with shell scripting (or if you want multiple people to be able to set up and tear down Promenade) you can sign up for a free account on Terraform cloud and add the `remote` backend to it as described [here](https://www.terraform.io/docs/backends/types/remote.html#basic-configuration). I'll add more specific setup instructions around Terraform Cloud if this angle really takes off.
+
 ## But I don't want to devise a new immersive show, I've really been dying to produce "American Buffalo" and--
 
 Well %#$@$, go talk to [@brendanAbradley](https://twitter.com/brendanAbradley) about his [FutureStages](https://www.youtube.com/watch?v=1hy7cVGVMW8) project. His tools are all open source and he has a lot of good ideas around how to produce the existing canon of theatre for virtual audiences. It's going to take a variety of approaches to keep theatre going, and they're all totally valid.

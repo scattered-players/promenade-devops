@@ -4,7 +4,7 @@ terraform {
       source = "hashicorp/aws"
     }
     cloudflare = {
-      source = "terraform-providers/cloudflare"
+      source = "cloudflare/cloudflare"
     }
     null = {
       source = "hashicorp/null"
@@ -12,6 +12,9 @@ terraform {
     template = {
       source = "hashicorp/template"
     }
+    tls = {
+      source = "hashicorp/tls"
+    }
   }
-  required_version = ">= 0.13"
+  required_version = ">= 0.14"
 }

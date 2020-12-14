@@ -9,9 +9,6 @@ sudo mkdir -p /mnt/secret
 # sudo chown 1000:1000 /mnt/secret
 sudo s3fs "${show_short_name}-secret" -o iam_role="${show_short_name}-certs-role" /mnt/secret
 
-# touch test.txt
-# cp test.txt /mnt/secret/test.txt
-
 sudo certbot certonly --standalone -m "${lets_encrypt_email}" -n --agree-tos --duplicate \
     -d "janus.${show_domain_name}" \
     -d "janus0.${show_domain_name}" \

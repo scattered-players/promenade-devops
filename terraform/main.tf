@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.13"
+  required_version = ">= 0.14"
 }
 
 provider "aws" {
@@ -7,7 +7,6 @@ provider "aws" {
 }
 
 provider "cloudflare" {
-  version = "~> 2.0"
   email = "chris.uehlinger@gmail.com"
   api_token = var.cloudflare_api_key
 }
@@ -52,6 +51,7 @@ data "template_file" "promenade_config" {
   vars = {
     show_short_name = var.show_short_name
     show_domain_name = var.show_domain_name
+    janus_server_count = var.janus_server_count
   }
 }
 
@@ -75,7 +75,8 @@ module "certs" {
   show_domain_name = var.show_domain_name
   lets_encrypt_email = var.lets_encrypt_email
   ssh_key_pair = aws_key_pair.show_key_pair.key_name
-  instance_size = var.instance_size
+  arch = var.arch
+  use_spot = var.use_spot
 }
 
 resource "random_password" "mongo_password" {
@@ -98,7 +99,8 @@ module "mongo" {
   mongo_user = local.mongo_user
   mongo_password = random_password.mongo_password.result
   ssh_key_pair = aws_key_pair.show_key_pair.key_name
-  instance_size = var.instance_size
+  arch = var.arch
+  use_spot = var.use_spot
 }
 
 module "show_service" {
@@ -117,7 +119,8 @@ module "show_service" {
   eventbrite_api_key = var.eventbrite_api_key
   eventbrite_series_id = var.eventbrite_series_id
   ssh_key_pair = aws_key_pair.show_key_pair.key_name
-  instance_size = var.instance_size
+  arch = var.arch
+  use_spot = var.use_spot
 }
 
 module "janus" {
@@ -130,5 +133,6 @@ module "janus" {
   server_count = var.janus_server_count
   ssh_key_pair = aws_key_pair.show_key_pair.key_name
   janus_api_key = random_password.janus_api_key.result
-  instance_size = var.instance_size
+  arch = var.arch
+  use_spot = var.use_spot
 }
