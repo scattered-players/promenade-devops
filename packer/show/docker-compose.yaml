@@ -1,7 +1,7 @@
 version: '3'
 services:
   showservice:
-    image: scatteredplayers/show:multiplatform
+    image: scatteredplayers/show:main
     environment: 
       - PORT=443
       - NODE_ENV=production

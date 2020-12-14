@@ -2,7 +2,7 @@ version: '2'
 services:
   janus:
     restart: unless-stopped
-    image: scatteredplayers/janus:multiplatform
+    image: scatteredplayers/janus:main
     network_mode: host
     volumes:
       - '/mnt/secret/letsencrypt:/etc/letsencrypt'
